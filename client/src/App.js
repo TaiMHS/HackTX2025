@@ -12,8 +12,12 @@ function App() {
   const [file, setFile] = useState(null);
 
   const handleFileChange = (event) => {
-    const selectedFile = event.target.files[0];
+    const selectedFile = event.target.files?.[0];
+    try { 
     const numRecipes = document.getElementById("numRecipes").value;
+    } catch (error) {
+      console.error("Error retrieving numRecipes:", error);
+    }
     setFile(selectedFile);
     
     // Optional: Create FormData if you want to send it to the backend
