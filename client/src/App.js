@@ -13,8 +13,9 @@ function App() {
 
   const handleFileChange = (event) => {
     const selectedFile = event.target.files?.[0];
+    const numRecipes = null;
     try { 
-    const numRecipes = document.getElementById("numRecipes").value;
+      numRecipes = document.getElementById("numRecipes").value;
     } catch (error) {
       console.error("Error retrieving numRecipes:", error);
     }
