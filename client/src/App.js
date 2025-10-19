@@ -1,4 +1,5 @@
 import React, {useState} from "react"
+import './App.css';
 
 function App() {
   const [data, setData] = useState([]);
@@ -7,11 +8,21 @@ function App() {
   const [file, setFile] = useState(null);
   const [recipes, setRecipes] = useState([]);
   const [numRecipes, setNumRecipes] = useState(1);
+  const [imageSrc, setImageSrc] = useState(null);
 
   // Debug effect to monitor data changes
   React.useEffect(() => {
     console.log("Data state changed:", data);
   }, [data]);
+
+  // Cleanup URL object when component unmounts or when imageSrc changes
+  React.useEffect(() => {
+    return () => {
+      if (imageSrc) {
+        URL.revokeObjectURL(imageSrc);
+      }
+    };
+  }, [imageSrc]);
 
   const handleNumRecipesChange = (event) => {
     setNumRecipes(Number(event.target.value)); 
@@ -20,13 +31,21 @@ function App() {
   const handleFileChange = (event) => {
     const selectedFile = event.target.files?.[0];
     
-    setFile(selectedFile);
+    // Clean up previous URL object if it exists
+    if (imageSrc) {
+      URL.revokeObjectURL(imageSrc);
+    }
     
+    setFile(selectedFile);
     if (!selectedFile) {
         setData({});
         setError(null);
+        setImageSrc(null);
         return;
     }
+    
+    // Create new URL object for the selected file
+    setImageSrc(URL.createObjectURL(selectedFile));
     
     const formData = new FormData();
     formData.append('myFile', selectedFile);
@@ -116,6 +135,10 @@ function App() {
           />
           
           <br/>
+          {imageSrc && (
+            <img src={imageSrc} alt="Uploaded Preview" style={{maxWidth: '150px', marginTop: '10px', borderRadius: '8px'}} />
+          )}
+          <br/>
           <label htmlFor="numRecipes">
             Number of Recipes: **{numRecipes}**
           </label>
@@ -148,15 +171,15 @@ function App() {
             return null;
           }
           return (
-            <div key={i}>
+            <div key={i} className="recipe-container">
               <h3>Recipe {i + 1}: {recipe.name}</h3>
-              <h4>Ingredients:</h4>
+              <h4>✨ Ingredients:</h4>
               <ul>
                 {recipe.ingredients && recipe.ingredients.map((ingredient, idx) => (
-                  <li key={idx}>{ingredient}</li>
+                  <li key={idx}>• {ingredient}</li>
                 ))}
               </ul>
-              <h4>Steps:</h4>
+              <h4>👨‍🍳 Steps:</h4>
               <ol>
                 {recipe.steps && recipe.steps.map((step, idx) => (
                   <li key={idx}>{step}</li>
