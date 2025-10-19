@@ -71,7 +71,7 @@ function App() {
           accept="image/png, image/jpeg, image/jpg"
           onChange={handleFileChange}
         />
-        <input></input>
+        <input type="range" id="numRecipes" name="numRecipes" min="1" max="10" defaultValue="1" />
         {file && (
           <p>Selected file: {file.name}</p>
         )}
