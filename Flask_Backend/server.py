@@ -40,7 +40,10 @@ def create_recipe():
     contents = [
         f"Generate recipe(s) using the following ingredients: " + ", ".join([label.description for label in labels])
     ]
-
+    instruct = {"You are a helpful FDA-approved assistant that creates food recipes based on given ingredients. " +
+    "You can also filter out non-food items from the ingredient list." + "Give up if the ingredients are insufficient to make a recipe."
+    + "Do not attempt to use ingredients that are not food items."
+    }
     try:
         gemini_response = AI_client.models.generate_content(
             model=model,
@@ -49,7 +52,7 @@ def create_recipe():
                 "temperature": 1.1,
                 "candidate_count": recipe_count,
                 # FIX 1: Changed to singular 'system_instruction'
-                "system_instruction": "You are a helpful FDA-approved assistant that creates recipes based on given ingredients. You can also filter out non-food items from the ingredient list.",
+                "system_instruction": instruct,
                 "response_schema": {
                     "type": "array",
                     "items": {
