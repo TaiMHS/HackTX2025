@@ -7,9 +7,11 @@
     "test": "react-scripts test"
   },
   "dependencies": {
-    "@google-cloud/vision": "^5.3.4"
+    "@google-cloud/vision": "^5.3.4",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
   },
   "devDependencies": {
-    "react-scripts": "^0.0.0"
+    "react-scripts": "^5.0.1"
   }
 }
