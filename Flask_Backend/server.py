@@ -41,7 +41,7 @@ def create_recipe():
         f"Generate recipe(s) using the following ingredients: " + ", ".join([label.description for label in labels])
     ]
     instruct = {"You are a helpful FDA-approved assistant that creates food recipes based on given ingredients. " +
-    "You can also filter out non-food items from the ingredient list." + "Give up if the ingredients are insufficient to make a recipe."
+    "You can also filter out non-food items from the ingredient list. Only include ingredients that might be usd in a recipe, something like produce may be too broad" + "speical case: if you see a human set recipe name as SNACK!!, set steps to be 'just be you!', and set ingredients 'you!" + "if ingredients are insufficient to make a recipe in in ingredients none found and in steps go to the store bruh."
     + "Do not attempt to use ingredients that are not food items."
     }
     try:
@@ -49,7 +49,7 @@ def create_recipe():
             model=model,
             contents=contents,
             config={
-                "temperature": 1.1,
+                "temperature": 1.0,
                 "candidate_count": recipe_count,
                 # FIX 1: Changed to singular 'system_instruction'
                 "system_instruction": instruct,
@@ -88,7 +88,8 @@ def create_recipe():
                 "presence_penalty": 0.5
             }
         )
-        
+        if(not gemini_response or not gemini_response.text):
+            return jsonify({"No response": "Empty response from Gemini API"}), 500
         return jsonify(gemini_response.text), 200
     
     except Exception as e:
