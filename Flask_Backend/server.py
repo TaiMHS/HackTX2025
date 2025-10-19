@@ -1,20 +1,19 @@
 from flask import Flask, jsonify, request
 from google.cloud import vision
 from google import genai
-import json
+import json, os
+from dotenv import load_dotenv
 
-# PROJECT_ID = "cobalt-abacus-475522-j2"  # @param {type: "string", placeholder: "[your-project-id]", isTemplate: true}
-# if not PROJECT_ID or PROJECT_ID == "cobalt-abacus-475522-j2":
-#     PROJECT_ID = str(os.environ.get("GOOGLE_CLOUD_PROJECT"))
-
-# LOCATION = os.environ.get("GOOGLE_CLOUD_REGION", "global")
+load_dotenv()
+api_key = os.getenv("API_KEY")
+vis_key = os.getenv("VIS_KEY")
 
 
 # Initialize Google Cloud Vision client
-vision_client = vision.ImageAnnotatorClient.from_service_account_file("api_key.json")
+vision_client = vision.ImageAnnotatorClient.from_service_account_file(vis_key)
 
 # Initialize Gemini API client
-AI_client = genai.Client(api_key="AIzaSyCDvUjcNYQHMYuIeNDDlWDFjLyhTAotlH8")
+AI_client = genai.Client(api_key=api_key)
 
 
 app = Flask(__name__)
