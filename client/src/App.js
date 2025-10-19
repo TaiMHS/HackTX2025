@@ -2,6 +2,9 @@ import React, {useState} from "react"
 import './App.css';
 import logo from './logo.png';
 
+process.env.REACT_APP_API_LINK = process.env.API_LINK;
+const urlbase = process.env.REACT_APP_API_LINK;
+
 function App() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -66,7 +69,7 @@ function App() {
   };
 
   function sendFileToBackend(formData) {
-    return fetch("/img_grab", {
+    return fetch(`${urlbase}/img_grab`, {
       method: "POST",
       body: formData,
     })
@@ -82,7 +85,7 @@ function App() {
   async function fetchRecipes() {
     try {
       console.log("Fetching recipes...");
-      const response = await fetch("/create_recipe", {method: "GET"});
+      const response = await fetch(`${urlbase}/create_recipe`, {method: "GET"});
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
