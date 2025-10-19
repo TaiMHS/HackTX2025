@@ -10,55 +10,53 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [file, setFile] = useState(null);
+  const [numRecipes, setNumRecipes] = useState(1);
 
   const handleFileChange = (event) => {
     const selectedFile = event.target.files?.[0];
-    const numRecipes = null;
-    try { 
-      numRecipes = document.getElementById("numRecipes").value;
-    } catch (error) {
-      console.error("Error retrieving numRecipes:", error);
-    }
     setFile(selectedFile);
     
     // Optional: Create FormData if you want to send it to the backend
     const formData = new FormData();
     formData.append('myFile', selectedFile);
     formData.append('numRecipes', numRecipes);
+
+
+    console.log("FormData prepared:", formData.get('myFile'));
+    console.log("Number of Recipes:", formData.get('numRecipes'));
     sendFileToBackend(formData);
+    fetchRecipes();
     // You can now use this formData to send to your backend
     // Example: sendFileToBackend(formData);
   };
 
-  function sendFileToBackend(formData){
-    fetch("/upload", {
+  function sendFileToBackend(formData) {
+    setLoading(true);
+    fetch("/img_grab", {
       method: "POST",
-      body: formData
+      body: formData,
     })
-    .then(response => response.json())
-    .then(data => {
-      console.log("File uploaded successfully:", data);
-    })
-    .catch(error => {
-      console.error("Error uploading file:", error);
-    });
+      .then((response) => {
+        if (!response.ok) throw new Error("Upload failed");
+        setLoading(false);
+        return response.json(); // just a success message if works
+      });
   }
 
-  useEffect(() => {
-    fetch("/members")
-      .then(res => {
-        if (!res.ok) throw new Error(`HTTP error ${res.status}`);
-        return res.json();
-      })
-      .then(json => {
-        setData(json);
+  function fetchRecipes() {
+    setLoading(true);
+    fetch("/get_recipes")
+      .then((response) => {
+        if (!response.ok) throw new Error("Network response was not ok");
         setLoading(false);
-      })
-      .catch(err => {
-        setError(err.message);
-        setLoading(false);
+        return response.json();
       });
-  }, []);
+  }
+
+  
+
+
+    
   
   return (
     <div className="App">

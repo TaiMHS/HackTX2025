@@ -95,7 +95,7 @@ def img_grab():
     if content is None:
         return jsonify({"error": "No image provided"}), 400
 
-    recipe_count = request.form.get('numRecipes', 1)
+    recipe_count = int(request.form.get('numRecipes', 1))
 
     if recipe_count is None:
         return jsonify({"error": "Number of recipes not provided"}), 400
@@ -109,6 +109,8 @@ def img_grab():
         labels = vision_response.label_annotations # Get labels from response
     except Exception as e:
         return jsonify({"error": f"Error processing image: {str(e)}"}), 500
+    
+    return jsonify({"message": "Image processed successfully"}), 200
 
     
     
