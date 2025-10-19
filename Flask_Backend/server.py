@@ -1,20 +1,20 @@
 from flask import Flask, jsonify, request
 from google.cloud import vision
 from google import genai
-import os
+import json
 
-PROJECT_ID = "cobalt-abacus-475522-j2"  # @param {type: "string", placeholder: "[your-project-id]", isTemplate: true}
-if not PROJECT_ID or PROJECT_ID == "cobalt-abacus-475522-j2":
-    PROJECT_ID = str(os.environ.get("GOOGLE_CLOUD_PROJECT"))
+# PROJECT_ID = "cobalt-abacus-475522-j2"  # @param {type: "string", placeholder: "[your-project-id]", isTemplate: true}
+# if not PROJECT_ID or PROJECT_ID == "cobalt-abacus-475522-j2":
+#     PROJECT_ID = str(os.environ.get("GOOGLE_CLOUD_PROJECT"))
 
-LOCATION = os.environ.get("GOOGLE_CLOUD_REGION", "global")
+# LOCATION = os.environ.get("GOOGLE_CLOUD_REGION", "global")
 
 
 # Initialize Google Cloud Vision client
 vision_client = vision.ImageAnnotatorClient.from_service_account_file("api_key.json")
 
 # Initialize Gemini API client
-AI_client = genai.Client(vertexai=True, project=PROJECT_ID, location=LOCATION)
+AI_client = genai.Client(api_key="AIzaSyCDvUjcNYQHMYuIeNDDlWDFjLyhTAotlH8")
 
 
 app = Flask(__name__)
@@ -30,6 +30,7 @@ labels = None
 def create_recipe():
     global recipe_count
     global labels
+    gemini_response = None
 
     if labels is None:
         return jsonify({"error": "No ingredients detected. Please upload an image first."}), 400
@@ -37,45 +38,58 @@ def create_recipe():
     # Prepare input for Gemini
     model = "gemini-2.0-flash"
     contents = [
-        f"Generate {recipe_count} recipe using the following ingredients: " + ", ".join([label.description for label in labels])
+        f"Generate recipe(s) using the following ingredients: " + ", ".join([label.description for label in labels])
     ]
 
     try:
-        gemini_response = AI_client.models.generate(
+        gemini_response = AI_client.models.generate_content(
             model=model,
             contents=contents,
-            temperature=1.1,
-            system_instructions="You are a helpful FDA approved assistant that creates recipes based on given ingredients.",
-            response_schema={
-                "type": "array",
-                "items": {
-                    "type": "object",
-                    "properties": {
-                        "name": {
-                            "type": "string",
-                            "description": "Name of the recipe."
+            config={
+                "temperature": 1.1,
+                "candidate_count": recipe_count,
+                # FIX 1: Changed to singular 'system_instruction'
+                "system_instruction": "You are a helpful FDA-approved assistant that creates recipes based on given ingredients. You can also filter out non-food items from the ingredient list.",
+                "response_schema": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "name": {
+                                "type": "string",
+                                "description": "Name of the recipe."
+                            },
+                            "ingredients": {
+                                "type": "array",
+                                "description": "List of ingredients detected from the image. Exclude numbering or bullet points.",
+                                # FIX 3: Added 'items' definition for the nested array
+                                "items": {
+                                    "type": "string"
+                                }
+                            },
+                            "steps": {
+                                "type": "array",
+                                "description": "A detailed list of steps using the provided ingredients. Exclude numbering or bullet points.",
+                                # FIX 3: Added 'items' definition for the nested array
+                                "items": {
+                                    "type": "string"
+                                }
+                            }
                         },
-                        "ingredients": {
-                            "type": "array",
-                            "description": "List of ingredients detected from the image. Exclude numbering or bullet points.",
-                        },
-                        "steps": {
-                            "type": "array",
-                            "description": "A detailed list of steps using the provided ingredients. Exclude numbering or bullet points."
-                        }
-                    }
+                        # FIX 2: Moved 'required' inside the 'object' definition
+                        "required": ["name", "ingredients", "steps"] 
+                    },
                 },
-                "required": ["name", "ingredients", "steps"]
-            },
-            response_mime_type="application/json",
-            frequency_penalty=0.2,
-            presence_penalty=0.5
+                "response_mime_type": "application/json",
+                "frequency_penalty": 0.2,
+                "presence_penalty": 0.5
+            }
         )
         
-        return jsonify(gemini_response)
+        return jsonify(gemini_response.text), 200
     
     except Exception as e:
-        return jsonify({"error": f"Error generating recipe: {str(e)}"}), 500
+        return jsonify({"error": str(e), "gemini_response": str(gemini_response)}), 500
 
 
 # Endpoint to handle image upload and processing
