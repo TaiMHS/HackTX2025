@@ -7,7 +7,7 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [file, setFile] = useState(null);
-  const [recipes, setRecipes] = useState([]);
+  //const [recipes, setRecipes] = useState([]);
   const [numRecipes, setNumRecipes] = useState(1);
   const [imageSrc, setImageSrc] = useState(null);
 
