@@ -1,5 +1,6 @@
 import React, {useState} from "react"
 import './App.css';
+import logo from './logo.png';
 
 function App() {
   const [data, setData] = useState([]);
@@ -122,7 +123,8 @@ function App() {
 
   return (
     <div className="App">
-      <h1>HackTX Flask-React App</h1>
+      <h1>LIC me 👅</h1>
+      <img src={logo} alt="Logo" style={{ maxWidth: '200px', margin: '20px 0' }} />
       <form>
         <div>
           <h2>File Upload</h2>
@@ -160,7 +162,10 @@ function App() {
       <hr/>
       
       {loading ? (
-        <p>Loading...</p>
+        <div>
+          <div className="loading"></div>
+          <p>Generating your recipes...</p>
+        </div>
       ) : error ? (
         <p style={{color: 'red'}}>Error: {error}</p>
       ) : data && data.length > 0 ? (
