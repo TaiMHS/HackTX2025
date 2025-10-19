@@ -82,7 +82,7 @@ function App() {
   async function fetchRecipes() {
     try {
       console.log("Fetching recipes...");
-      const response = await fetch("/create_recipe");
+      const response = await fetch("/create_recipe", {method: "GET"});
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
