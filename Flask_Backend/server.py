@@ -8,13 +8,13 @@ import json
 #     PROJECT_ID = str(os.environ.get("GOOGLE_CLOUD_PROJECT"))
 
 # LOCATION = os.environ.get("GOOGLE_CLOUD_REGION", "global")
-
+api_key = "<replace with your API key>"
 
 # Initialize Google Cloud Vision client
 vision_client = vision.ImageAnnotatorClient.from_service_account_file("api_key.json")
 
 # Initialize Gemini API client
-AI_client = genai.Client(api_key="AIzaSyCDvUjcNYQHMYuIeNDDlWDFjLyhTAotlH8")
+AI_client = genai.Client(api_key=api_key)
 
 
 app = Flask(__name__)
