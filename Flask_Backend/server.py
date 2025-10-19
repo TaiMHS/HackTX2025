@@ -38,7 +38,7 @@ def create_recipe():
     # Prepare input for Gemini
     model = "gemini-2.0-flash"
     contents = [
-        f"Generate recipe(s) using the following ingredients: " + ", ".join([label.description for label in labels])
+        f"Generate {recipe_count} recipe(s) using the following ingredients: " + ", ".join([label.description for label in labels])
     ]
     instruct = {"You are a helpful FDA-approved assistant that creates food recipes based on given ingredients. " +
     "You can also filter out non-food items from the ingredient list. Only include ingredients that might be usd in a recipe, something like produce may be too broad" + "speical case: if you see a human set recipe name as SNACK!!, set steps to be 'just be you!', and set ingredients 'you!" + "if ingredients are insufficient to make a recipe in in ingredients none found and in steps go to the store bruh."
@@ -49,7 +49,7 @@ def create_recipe():
             model=model,
             contents=contents,
             config={
-                "temperature": 1.0,
+                "temperature": 0.7,
                 "candidate_count": recipe_count,
                 # FIX 1: Changed to singular 'system_instruction'
                 "system_instruction": instruct,
@@ -85,7 +85,7 @@ def create_recipe():
                 },
                 "response_mime_type": "application/json",
                 "frequency_penalty": 0.2,
-                "presence_penalty": 0.5
+                "presence_penalty": 0.4
             }
         )
         if(not gemini_response or not gemini_response.text):
